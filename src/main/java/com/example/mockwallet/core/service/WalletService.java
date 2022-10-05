@@ -1,6 +1,5 @@
 package com.example.mockwallet.core.service;
 
-import com.example.mockwallet.api.TransferRequest;
 import com.example.mockwallet.core.domain.CreateAccountRequest;
 import com.example.mockwallet.core.domain.Funds;
 import com.example.mockwallet.core.exception.WalletException;
@@ -28,11 +27,11 @@ public class WalletService {
     if (createAccountRequest == null) {
       throw WalletException.internalError();
     }
-    walletRepository.writeAccount(createAccountRequest.getAccountId(), createAccountRequest.getInitialFunds());
+    walletRepository.writeWallet(createAccountRequest.getAccountId(), createAccountRequest.getInitialFunds());
     return createAccountRequest.getAccountId();
   }
 
   public Funds getBalance(String accountId) {
-    return walletRepository.fetchAccount(accountId).getBalance();
+    return walletRepository.fetchWallet(accountId).getBalance();
   }
 }

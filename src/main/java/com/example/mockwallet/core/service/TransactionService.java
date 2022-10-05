@@ -26,8 +26,11 @@ public class TransactionService {
   }
 
   public void transfer(TransferRequest transferRequest) {
-    var sendingWallet = walletRepository.fetchAccount(transferRequest.getSenderWalletId());
-    var receivingWallet = walletRepository.fetchAccount(transferRequest.getReceivingWalletId());
+    if (transferRequest.getSenderWalletId().equals(transferRequest.getReceivingWalletId())) {
+      throw WalletException.badRequest("Can't transfer to yourself");
+    }
+    var sendingWallet = walletRepository.fetchWallet(transferRequest.getSenderWalletId());
+    var receivingWallet = walletRepository.fetchWallet(transferRequest.getReceivingWalletId());
     var transferAmount = transferRequest.getAmount();
     var newSendingWalletTempBalance = sendingWallet.getBalance().subtract(transferAmount);
     var newReceivingWalletTempBalance = receivingWallet.getBalance().add(transferAmount);
@@ -35,8 +38,8 @@ public class TransactionService {
     if (newSendingWalletTempBalance.compareTo(new Funds(0)) < 0) {
       throw WalletException.badRequest("Insufficient funds");
     }
-    walletRepository.updateFundsForAccount(sendingWallet, newSendingWalletTempBalance);
-    walletRepository.updateFundsForAccount(receivingWallet, newReceivingWalletTempBalance);
+    walletRepository.updateFundsForWallet(sendingWallet, newSendingWalletTempBalance);
+    walletRepository.updateFundsForWallet(receivingWallet, newReceivingWalletTempBalance);
     transactionRepository.writeTransaction(sendingWallet.getId(), receivingWallet.getId(), transferAmount);
   }
 

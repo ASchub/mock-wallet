@@ -25,8 +25,8 @@ public class WalletRepository {
     this.jooq = jooq;
   }
 
-  public void writeAccount(String accountId, Funds initialBalance) {
-    if (accountId == null || initialBalance == null) {
+  public void writeWallet(String walletId, Funds initialBalance) {
+    if (walletId == null || initialBalance == null) {
       throw WalletException.internalError();
     }
     jooq
@@ -36,12 +36,12 @@ public class WalletRepository {
         WALLET_TABLE.BALANCE
       )
       .values(
-        accountId,
+        walletId,
         initialBalance.getDoubleValue()
       ).execute();
   }
 
-  public Wallet fetchAccount(String accountId) {
+  public Wallet fetchWallet(String accountId) {
     if (accountId == null) {
       throw WalletException.internalError();
     }
@@ -50,19 +50,19 @@ public class WalletRepository {
       .where(WALLET_TABLE.ID.eq(accountId))
       .fetchOne();
     if (account == null) {
-      throw WalletException.notFound();
+      throw WalletException.notFound("Wallet not found");
     }
-    return account.map(this::createAccount);
+    return account.map(this::createWallet);
   }
 
-  private Wallet createAccount(Record accountRecord) {
+  private Wallet createWallet(Record walletRecord) {
     return new Wallet(
-      accountRecord.get(WALLET_TABLE.ID),
-      new Funds(accountRecord.get(WALLET_TABLE.BALANCE)),
-      LocalDateTime.ofInstant(accountRecord.get(WALLET_TABLE.CREATED_AT).toInstant(), ZoneId.systemDefault()));
+      walletRecord.get(WALLET_TABLE.ID),
+      new Funds(walletRecord.get(WALLET_TABLE.BALANCE)),
+      LocalDateTime.ofInstant(walletRecord.get(WALLET_TABLE.CREATED_AT).toInstant(), ZoneId.systemDefault()));
   }
 
-  public void updateFundsForAccount(Wallet wallet, Funds newBalance) {
+  public void updateFundsForWallet(Wallet wallet, Funds newBalance) {
     if (wallet == null || newBalance == null) {
       throw WalletException.internalError();
     }

@@ -33,6 +33,10 @@ public final class WalletException extends RuntimeException {
     return new WalletException(BaseType.NOT_FOUND, lazyError());
   }
 
+  public static WalletException notFound(String message) {
+    return new WalletException(BaseType.NOT_FOUND, message);
+  }
+
   public BaseType getType() {
     return type;
   }
